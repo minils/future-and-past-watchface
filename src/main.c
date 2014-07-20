@@ -11,6 +11,35 @@ InverterLayer *inv_layer;
 char buffer[] = "00:00";
 
 /**
+ *  Used to free the memory of the animation.
+ */
+void on_animation_stopped(Animation *anim, bool finished, void *context)
+{
+  property_animation_destroy((PropertyAnimation*) anim);
+}
+
+/**
+ *  Animate the screen when new minute is entered
+ */
+void animate_layer(Layer *layer, GRect *start, GRect *finish, int duration, int delay)
+{
+  // Declare animation
+  PropertyAnimation *anim = property_animation_create_layer_frame(layer, start, finish);
+  
+  // set characteristics
+  animation_set_duration((Animation*) anim, duration);
+  animation_set_delay((Animation*) anim, delay);
+  
+  // set stopped handler to free memory
+  AnimationHandlers handlers = {
+    // the reference to the stopped handler is the only one in the array
+    .stopped = (AnimationStoppedHandler) on_animation_stopped
+  };
+  // start animation
+  animation_schedule((Animation*) anim);
+}
+
+/**
  *  Update the watchface display.
  */
 void tick_handler(struct tm *tick_time, TimeUnits units_changed)
@@ -18,8 +47,30 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed)
   // Format the buffer string using tick_time as the time source
   strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
   
-  // Change the TextLayer text to show the new time
-  text_layer_set_text(text_layer, buffer);
+  int seconds = tick_time->tm_sec;
+  
+  if (seconds == 59)
+  {
+    // slide offscreen to the bottom
+    GRect start = GRect(0, 60, 144, 168);
+    GRect finish = GRect(0, 168, 144, 168);
+    animate_layer(text_layer_get_layer(text_layer), &start, &finish, 300, 500);
+  }
+  else if (seconds == 0)
+  {
+    // change the TextLayer text to show the new time
+    text_layer_set_text(text_layer, buffer);
+    
+    // Slide onscreen from the top
+    GRect start = GRect(0, -168, 144, 168);
+    GRect finish = GRect(0, 60, 144, 168);
+    animate_layer(text_layer_get_layer(text_layer), &start, &finish, 300, 500);
+  }
+  else
+  {
+    // change the TextLayer text to show the new time
+    text_layer_set_text(text_layer, buffer);
+  }
 }
 
 /**
@@ -30,7 +81,8 @@ void window_load(Window *window)
   // load font
   ResHandle font_handle = resource_get_handle(RESOURCE_ID_FONT_DIGITAL_DREAM_30);
   
-  text_layer = text_layer_create(GRect(8, 60, 125, 160));
+  //text_layer = text_layer_create(GRect(8, 60, 125, 160));
+  text_layer = text_layer_create(GRect(0, 60, 144, 168));
   text_layer_set_background_color(text_layer, GColorClear);
   text_layer_set_text_color(text_layer, GColorBlack);
   text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
@@ -91,7 +143,7 @@ void init()
     .unload = window_unload,
   });
   window_stack_push(window, true);
-  tick_timer_service_subscribe(MINUTE_UNIT, (TickHandler) tick_handler);
+  tick_timer_service_subscribe(SECOND_UNIT, (TickHandler) tick_handler);
 }
 
 /**
