@@ -34,7 +34,7 @@
     "shortName": "Future And Past",
     "uuid": "5ea250a5-e483-4650-a135-8618abbe358f",
     "versionCode": 1,
-    "versionLabel": "1.0",
+    "versionLabel": "1.1",
     "watchapp": {
         "watchface": true
     }

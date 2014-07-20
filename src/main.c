@@ -1,12 +1,17 @@
 #include <pebble.h>
 
 Window *window;
-TextLayer *text_layer;
-
-GBitmap *future_bitmap, *past_bitmap;
+TextLayer *text_layer, *square_layer;
+InverterLayer *inv_layer;
 BitmapLayer *future_layer, *past_layer;
 
-InverterLayer *inv_layer;
+GBitmap *future_bitmap, *past_bitmap;
+
+/* Variables for the square animation */
+AppTimer *timer;
+const int sqare_size = 10;
+const int delta = 40;
+int dx = 1;  // speed and direction
 
 char buffer[] = "00:00";
 
@@ -78,22 +83,6 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed)
  */
 void window_load(Window *window)
 {
-  // load font
-  ResHandle font_handle = resource_get_handle(RESOURCE_ID_FONT_DIGITAL_DREAM_30);
-  
-  //text_layer = text_layer_create(GRect(8, 60, 125, 160));
-  text_layer = text_layer_create(GRect(0, 60, 144, 168));
-  text_layer_set_background_color(text_layer, GColorClear);
-  text_layer_set_text_color(text_layer, GColorBlack);
-  text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
-  //text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
-  text_layer_set_font(text_layer, fonts_load_custom_font(font_handle));
-  
-  layer_add_child(window_get_root_layer(window), (Layer*) text_layer);
-  
-  inv_layer = inverter_layer_create(GRect(0, 50, 144, 62));
-  layer_add_child(window_get_root_layer(window), (Layer*) inv_layer);
-  
   // load bitmaps into GBitmap structures
   future_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_FUTURE);
   past_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_PAST);
@@ -106,6 +95,24 @@ void window_load(Window *window)
   past_layer = bitmap_layer_create(GRect(0, 112, 144, 50));
   bitmap_layer_set_bitmap(past_layer, past_bitmap);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(past_layer));
+  
+    // load font
+  ResHandle font_handle = resource_get_handle(RESOURCE_ID_FONT_DIGITAL_DREAM_30);
+  
+  // add the text layer
+  //text_layer = text_layer_create(GRect(8, 60, 125, 160));
+  text_layer = text_layer_create(GRect(0, 60, 144, 168));
+  text_layer_set_background_color(text_layer, GColorClear);
+  text_layer_set_text_color(text_layer, GColorBlack);
+  text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
+  //text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
+  text_layer_set_font(text_layer, fonts_load_custom_font(font_handle));
+  
+  layer_add_child(window_get_root_layer(window), (Layer*) text_layer);
+  
+  // add the inverting layer
+  inv_layer = inverter_layer_create(GRect(0, 50, 144, 62));
+  layer_add_child(window_get_root_layer(window), (Layer*) inv_layer);
   
   // get a time structure so that the face doesn't start blank
   struct tm *t;
