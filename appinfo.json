@@ -1,0 +1,41 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "minils.de",
+    "longName": "Future And Past Watchface",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "fonts/DigitaldreamFat.ttf",
+                "name": "FONT_DIGITAL_DREAM_30",
+                "type": "font"
+            },
+            {
+                "file": "images/Past.png",
+                "name": "IMAGE_PAST",
+                "type": "png"
+            },
+            {
+                "file": "images/Future.png",
+                "name": "IMAGE_FUTURE",
+                "type": "png"
+            },
+            {
+                "file": "images/Watchface_Icon.png",
+                "menuIcon": true,
+                "name": "IMAGE_APP_ICON",
+                "type": "png"
+            }
+        ]
+    },
+    "shortName": "Future And Past",
+    "uuid": "5ea250a5-e483-4650-a135-8618abbe358f",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
