@@ -7,12 +7,6 @@ BitmapLayer *future_layer, *past_layer;
 
 GBitmap *future_bitmap, *past_bitmap;
 
-/* Variables for the square animation */
-AppTimer *timer;
-const int sqare_size = 10;
-const int delta = 40;
-int dx = 1;  // speed and direction
-
 char buffer[] = "00:00";
 
 /**
